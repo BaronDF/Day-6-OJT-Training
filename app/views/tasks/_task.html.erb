@@ -1,17 +1,43 @@
-<div id="<%= dom_id task %>">
+
+<div id="<%= dom_id task %>" class="space-y-4">
+
+  <!-- Title -->
   <div>
-    <strong>Title:</strong>
-    <%= task.title %>
+    <p class="mb-1 text-sm font-semibold text-slate-400">TITLE</p>
+    <h3 class="text-xl font-bold text-white">
+      <%= task.title %>
+    </h3>
   </div>
 
+  <!-- Description -->
   <div>
-    <strong>Description:</strong>
-    <%= task.description %>
+    <p class="mb-1 text-sm font-semibold text-slate-400">DESCRIPTION</p>
+    <p class="leading-relaxed text-slate-300">
+      <%= task.description.presence || "No description provided." %>
+    </p>
   </div>
 
+  <!-- Category -->
   <div>
-    <strong>Completed:</strong>
-    <%= task.completed %>
+    <p class="mb-2 text-sm font-semibold text-slate-400">CATEGORY</p>
+    <span class="inline-flex rounded-full bg-sky-900 px-3 py-1 text-sm font-semibold text-sky-300">
+      <%= task.category&.name || "Uncategorized" %>
+    </span>
+  </div>
+
+  <!-- Status -->
+  <div>
+    <p class="mb-1 text-sm font-semibold text-slate-400">STATUS</p>
+
+    <% if task.completed %>
+      <span class="inline-flex rounded-full bg-green-900 px-3 py-1 text-sm font-semibold text-green-300">
+        Completed
+      </span>
+    <% else %>
+      <span class="inline-flex rounded-full bg-yellow-900 px-3 py-1 text-sm font-semibold text-yellow-300">
+        In Progress
+      </span>
+    <% end %>
   </div>
 
 </div>

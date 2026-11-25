@@ -24,13 +24,21 @@
     </div>
 
     <div>
-      <%= form.label :description, class: "mb-2 block font-semibold text-slate-200" %>
+  <%= form.label :description, "Description",
+      class: "mb-2 block font-semibold text-slate-200" %>
 
-      <%= form.textarea :description,
-          rows: 6,
-          class: "box-border block w-full resize-y rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-base text-white placeholder-slate-500 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500",
-          placeholder: "Describe your task..." %>
-    </div>
+  <%= form.text_area :description, rows: 4,
+      class: "box-border block w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-base text-white outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500" %>
+</div>
+
+    <div>
+  <%= form.label :category_id, "Category",
+      class: "mb-2 block font-semibold text-slate-200" %>
+
+  <%= form.collection_select :category_id, @categories, :id, :name,
+      { prompt: "Select a category" },
+      { class: "box-border block w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-base text-white outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500" } %>
+</div>
 
     <div class="flex items-center gap-3">
       <%= form.checkbox :completed,
