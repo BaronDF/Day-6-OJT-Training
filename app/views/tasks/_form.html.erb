@@ -1,9 +1,12 @@
+
 <%= form_with(model: task) do |form| %>
   <% if task.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(task.errors.count, "error") %> prohibited this task from being saved:</h2>
+    <div class="mb-6 rounded-lg border border-red-800 bg-red-950 p-4 text-red-300">
+      <h2 class="mb-2 font-bold">
+        <%= pluralize(task.errors.count, "error") %> prohibited this task from being saved:
+      </h2>
 
-      <ul>
+      <ul class="list-inside list-disc">
         <% task.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -11,22 +14,34 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :title, style: "display: block" %>
-    <%= form.text_field :title %>
-  </div>
+  <div class="space-y-6">
+    <div>
+      <%= form.label :title, class: "mb-2 block font-semibold text-slate-200" %>
 
-  <div>
-    <%= form.label :description, style: "display: block" %>
-    <%= form.textarea :description %>
-  </div>
+      <%= form.text_field :title,
+          class: "box-border block w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-base text-white placeholder-slate-500 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500",
+          placeholder: "Enter your task title" %>
+    </div>
 
-  <div>
-    <%= form.label :completed, style: "display: block" %>
-    <%= form.checkbox :completed %>
-  </div>
+    <div>
+      <%= form.label :description, class: "mb-2 block font-semibold text-slate-200" %>
 
-  <div>
-    <%= form.submit %>
+      <%= form.textarea :description,
+          rows: 6,
+          class: "box-border block w-full resize-y rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-base text-white placeholder-slate-500 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-500",
+          placeholder: "Describe your task..." %>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <%= form.checkbox :completed,
+          class: "h-5 w-5 rounded border-slate-600 bg-slate-950 text-sky-500 focus:ring-sky-500" %>
+
+      <%= form.label :completed, "Mark as completed",
+          class: "font-medium text-slate-300" %>
+    </div>
+
+    <div>
+      <%= form.submit class: "w-full cursor-pointer rounded-xl bg-sky-600 px-5 py-3 font-semibold text-white transition hover:bg-sky-500" %>
+    </div>
   </div>
 <% end %>
