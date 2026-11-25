@@ -4,7 +4,7 @@
 
 This project is a simple Task Manager web application developed using Ruby on Rails during my On-the-Job Training (OJT).
 
-The application allows users to create, view, edit, and delete tasks. It uses PostgreSQL as its database management system and Tailwind CSS for styling the user interface.
+The application allows users to create, view, edit, and delete tasks. It also supports task categorization through a relationship between the Task and Category models. It uses PostgreSQL as its database management system and Tailwind CSS for styling the user interface.
 
 ## Technologies Used
 
@@ -174,6 +174,152 @@ Successfully pushed the updated project to the `main` branch of the GitHub repos
 
 ---
 
+# Day 8 – Model Relationships and Validations
+
+## Activities Completed
+
+### 1. Category Model Creation
+
+Generated a new Category model using:
+
+```bash
+rails generate model Category name:string
+```
+
+This created the Category model and its corresponding database migration.
+
+### 2. Model Relationships
+
+Established a one-to-many relationship between Category and Task.
+
+Updated `app/models/category.rb`:
+
+```ruby
+class Category < ApplicationRecord
+  has_many :tasks, dependent: :nullify
+
+  validates :name, presence: true, uniqueness: true
+end
+```
+
+Updated `app/models/task.rb`:
+
+```ruby
+class Task < ApplicationRecord
+  belongs_to :category, optional: true
+
+  validates :title, presence: true
+end
+```
+
+These associations allow:
+- One Category to have many Tasks.
+- Each Task to belong to one Category.
+- Existing tasks to remain valid even if they do not have a category.
+
+### 3. Database Migration and Foreign Key
+
+Generated a migration to add a category reference to the tasks table:
+
+```bash
+rails generate migration AddCategoryToTasks category:references
+```
+
+Configured the migration to allow existing tasks to have no category:
+
+```ruby
+class AddCategoryToTasks < ActiveRecord::Migration[8.1]
+  def change
+    add_reference :tasks, :category, null: true, foreign_key: true
+  end
+end
+```
+
+Executed the migration using:
+
+```bash
+rails db:migrate
+```
+
+This added the `category_id` column and foreign key to the tasks table.
+
+### 4. Model Validations
+
+Added validations to ensure data integrity.
+
+- Category names must be present.
+- Category names must be unique.
+- Task titles must be present.
+
+These validations help prevent incomplete or duplicate records.
+
+### 5. Controller Updates
+
+Updated the `TasksController` to load available categories when creating and editing tasks.
+
+Also updated the strong parameters to permit the `category_id` attribute:
+
+```ruby
+def task_params
+  params.expect(task: [ :title, :description, :completed, :category_id ])
+end
+```
+
+Loaded categories when rendering the forms again after validation errors to keep the Category dropdown available.
+
+### 6. Category Dropdown Integration
+
+Updated the shared task form in:
+
+`app/views/tasks/_form.html.erb`
+
+Added a Category dropdown using Rails' `collection_select` helper.
+
+This allows users to select a category when creating or editing a task.
+
+### 7. Displaying Related Category Data
+
+Updated the application views to display the associated category.
+
+**Main Tasks Page**
+- Added the Category badge to each task card.
+- Displayed the selected category alongside the task title, description, and status.
+- Displayed "Uncategorized" when a task has no category.
+
+**Task Details Page**
+- Added a Category section.
+- Displayed the category associated with the selected task.
+- Used a styled badge consistent with the application's dark theme.
+
+### 8. Testing and Verification
+
+Tested the Category and Task relationship and verified the following:
+
+- Successfully created categories.
+- Successfully created tasks with selected categories.
+- Confirmed that the selected category appears on the task details page.
+- Confirmed that categories appear on the main Tasks page.
+- Successfully edited tasks and changed their categories.
+- Verified that task title validation prevents submission without a title.
+- Confirmed that the Category dropdown remains available when the form is displayed again after a validation error.
+
+### 9. Git and GitHub Updates
+
+Committed and pushed the Day 8 changes to the existing GitHub repository.
+
+Used Git commands to stage, commit, synchronize, and push the updates:
+
+```bash
+git add .
+git commit -m "Day 8 Add Category and Task model relationships"
+git pull --rebase origin main
+git push origin main
+```
+
+Successfully synchronized the local project with the remote repository and uploaded the Day 8 changes to the `main` branch.
+
+---
+
 ## Project Structure
 
 ```text
@@ -186,15 +332,21 @@ first_rails_app/
 │   ├── controllers/
 │   │   └── tasks_controller.rb
 │   ├── models/
+│   │   ├── category.rb
 │   │   └── task.rb
 │   └── views/
 │       ├── layouts/
 │       └── tasks/
+│           ├── _form.html.erb
+│           ├── _task.html.erb
+│           ├── index.html.erb
+│           └── show.html.erb
 ├── config/
 │   ├── database.yml
 │   └── routes.rb
 ├── db/
-│   └── migrate/
+│   ├── migrate/
+│   └── schema.rb
 ├── test/
 ├── Gemfile
 ├── Gemfile.lock
@@ -218,6 +370,12 @@ Throughout these OJT activities, I learned how to:
 10. Style Rails views, forms, buttons, and layouts using Tailwind CSS.
 11. Test CRUD functionality after customizing the application.
 12. Use Git commands to commit and push project updates to GitHub.
+13. Create model associations using Active Record.
+14. Establish one-to-many relationships between database tables.
+15. Use foreign keys to connect related records.
+16. Apply model validations to maintain data integrity.
+17. Use strong parameters to permit associated model attributes.
+18. Display related model data in Rails views using ERB.
 
 ## Conclusion
 
@@ -225,6 +383,8 @@ During Day 6, I successfully set up a Ruby on Rails application, configured Post
 
 During Day 7, I continued developing the same application by integrating Tailwind CSS, customizing the homepage and task forms, improving the task details page, and testing the CRUD operations again.
 
-These activities helped strengthen my understanding of Ruby on Rails, database configuration, MVC architecture, frontend styling, application testing, and Git version control.
+During Day 8, I expanded the application by introducing a Category model and establishing a relationship between Category and Task. I also implemented model validations, database migrations, a category selection dropdown, and the display of related category information on the main page and task details page.
+
+These activities helped strengthen my understanding of Ruby on Rails, database configuration, MVC architecture, Active Record associations, data validation, frontend styling, application testing, and Git version control.
 
 This project serves as a foundation for learning more advanced Rails concepts and improving my web application development skills.
