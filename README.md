@@ -1,44 +1,25 @@
-
-# README
-
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-# Day 6 OJT Training Task Manager – Ruby on Rails OJT Project
+# Task Manager – Ruby on Rails OJT Project
 
 ## Project Overview
 
 This project is a simple Task Manager web application developed using Ruby on Rails during my On-the-Job Training (OJT).
 
-The application allows users to create, view, edit, and delete tasks. It uses PostgreSQL as its database management system.
+The application allows users to create, view, edit, and delete tasks. It uses PostgreSQL as its database management system and Tailwind CSS for styling the user interface.
 
 ## Technologies Used
 
 - **Ruby** – Programming language
 - **Ruby on Rails 8.1.4.1** – Web application framework
 - **PostgreSQL 18** – Database management system
+- **Tailwind CSS** – CSS framework for styling
 - **Bundler** – Ruby gem dependency manager
 - **Visual Studio Code** – Code editor
 - **PowerShell** – Command-line interface
+- **Git and GitHub** – Version control and project repository
+
+---
+
+# Day 6 – Task Manager Setup and CRUD Implementation
 
 ## Activities Completed
 
@@ -109,16 +90,105 @@ Accessed the application through:
 
 http://localhost:3000
 
+---
+
+# Day 7 – Task Manager Customization and Tailwind CSS Integration
+
+## Activities Completed
+
+### 1. Tailwind CSS Installation
+
+Installed Tailwind CSS for the Rails application using:
+
+```bash
+bundle add tailwindcss-rails
+```
+
+Then executed:
+
+```bash
+bundle exec rails tailwindcss:install
+```
+
+This configured Tailwind CSS and generated the necessary files for styling the application.
+
+### 2. Homepage Customization
+
+- Redesigned the Task Manager homepage using Tailwind CSS.
+- Applied a dark-themed interface with a slate-colored background.
+- Added a welcome section and improved task display.
+- Styled buttons, task cards, and the empty-state message.
+
+### 3. Form Customization
+
+Customized the New Task and Edit Task forms.
+
+- Styled text fields and description areas.
+- Improved labels, spacing, and padding.
+- Added focus effects to form inputs.
+- Styled the checkbox and submit button.
+- Improved the overall form layout.
+
+### 4. Task Details Page Customization
+
+Redesigned the Show Task page.
+
+- Added a task details section.
+- Displayed task completion status using badges.
+- Improved the description layout.
+- Styled the Edit, Back to Tasks, and Delete Task buttons.
+- Added a browser confirmation prompt before deleting a task.
+
+### 5. Controller Customization
+
+Updated the `TasksController` index action to display the newest tasks first:
+
+```ruby
+def index
+  @tasks = Task.order(created_at: :desc)
+end
+```
+
+### 6. CRUD Functionality Testing
+
+Performed additional tests to verify that the customized application continued to work correctly.
+
+- **Create** – Successfully created a test task.
+- **Read** – Viewed the task details.
+- **Update** – Modified the task title and description.
+- **Delete** – Deleted the test task and verified the confirmation prompt.
+
+All four CRUD operations were successfully tested.
+
+### 7. Git and GitHub Updates
+
+Used Git commands through the VS Code terminal to save and upload the Day 7 changes.
+
+```bash
+git add .
+git commit -m "Day 7 Task Manager styled with Tailwind CSS"
+git push origin main
+```
+
+Successfully pushed the updated project to the `main` branch of the GitHub repository.
+
+---
+
 ## Project Structure
 
 ```text
 first_rails_app/
 ├── app/
+│   ├── assets/
+│   │   ├── builds/
+│   │   └── tailwind/
+│   │       └── application.css
 │   ├── controllers/
 │   │   └── tasks_controller.rb
 │   ├── models/
 │   │   └── task.rb
 │   └── views/
+│       ├── layouts/
 │       └── tasks/
 ├── config/
 │   ├── database.yml
@@ -127,12 +197,14 @@ first_rails_app/
 │   └── migrate/
 ├── test/
 ├── Gemfile
+├── Gemfile.lock
+├── Procfile.dev
 └── README.md
 ```
 
 ## What I Learned
 
-Throughout this OJT activity, I learned how to:
+Throughout these OJT activities, I learned how to:
 
 1. Set up a Ruby on Rails development environment.
 2. Configure PostgreSQL as the database for a Rails application.
@@ -141,12 +213,18 @@ Throughout this OJT activity, I learned how to:
 5. Perform database migrations.
 6. Understand the basic MVC (Model-View-Controller) structure.
 7. Implement CRUD operations using Rails scaffolding.
-8. Configure application routes.
-9. Run and test a Rails application locally.
+8. Configure application routes and customize controller actions.
+9. Integrate Tailwind CSS into a Rails application.
+10. Style Rails views, forms, buttons, and layouts using Tailwind CSS.
+11. Test CRUD functionality after customizing the application.
+12. Use Git commands to commit and push project updates to GitHub.
 
 ## Conclusion
 
-This OJT activity helped me understand the fundamentals of Ruby on Rails development, database configuration, and application structure. I successfully created a functional Task Manager application connected to PostgreSQL and tested its basic CRUD operations.
+During Day 6, I successfully set up a Ruby on Rails application, configured PostgreSQL as its database, and implemented basic CRUD functionality for the Task Manager.
 
-This project serves as a foundation for learning more advanced Rails concepts and improving web application development skills.
- 67fd3794f79df812bd7181954dfcfb615a6a915b
+During Day 7, I continued developing the same application by integrating Tailwind CSS, customizing the homepage and task forms, improving the task details page, and testing the CRUD operations again.
+
+These activities helped strengthen my understanding of Ruby on Rails, database configuration, MVC architecture, frontend styling, application testing, and Git version control.
+
+This project serves as a foundation for learning more advanced Rails concepts and improving my web application development skills.
