@@ -4,7 +4,9 @@
 
 This project is a simple Task Manager web application developed using Ruby on Rails during my On-the-Job Training (OJT).
 
-The application allows users to create, view, edit, and delete tasks. It also supports task categorization through a relationship between the Task and Category models. It uses PostgreSQL as its database management system and Tailwind CSS for styling the user interface.
+The application allows users to create, view, edit, and delete tasks. It also supports task categorization through a relationship between the Task and Category models. User authentication is also implemented, allowing users to register, log in, and log out while protecting task routes from unauthenticated access.
+
+The application uses PostgreSQL as its database management system and Tailwind CSS for styling the user interface.
 
 ## Technologies Used
 
@@ -320,6 +322,124 @@ Successfully synchronized the local project with the remote repository and uploa
 
 ---
 
+# Day 9 – Authentication and Forms
+
+## Activities Completed
+
+### 1. Authentication Setup
+
+Used the Rails authentication generator to create the necessary authentication-related files.
+
+Generated components included:
+- User model
+- Session model
+- Current session model
+- Sessions controller
+- Passwords controller
+- Authentication concern
+- Login view
+- Password-related views
+- Database migrations for users and sessions
+
+### 2. Database Migration
+
+Executed the database migrations to create the necessary tables for authentication.
+
+Created:
+- Users table
+- Sessions table
+
+These tables allow the application to store user account information and manage authenticated sessions.
+
+### 3. User Registration
+
+Created a registration controller and registration form.
+
+The registration form includes:
+- Email address
+- Password
+- Password confirmation
+- Create Account button
+
+Implemented the registration functionality so users can create their own accounts.
+
+After successful registration, the user is automatically logged in and redirected to the Task Manager homepage.
+
+### 4. User Login
+
+Customized the login page using Tailwind CSS.
+
+Added:
+- Email address field
+- Password field
+- Forgot password link
+- Sign In button
+- Link to the registration page
+
+Implemented login functionality using the user's email address and password.
+
+### 5. User Logout
+
+Implemented logout functionality using the Rails session system.
+
+Added a Log Out button to the navigation bar for authenticated users.
+
+When users log out, their current session is terminated and they are redirected to the login page.
+
+### 6. Authentication Navigation and Flash Messages
+
+Updated the application layout to include navigation links based on the user's authentication status.
+
+**When Logged In**
+- Displays a welcome message.
+- Shows the Log Out button.
+
+**When Logged Out**
+- Shows the Log In link.
+- Shows the Register link.
+
+Also added flash message displays for notices and alerts to provide feedback to users.
+
+### 7. Protected Routes
+
+Used the authentication concern to require users to be authenticated before accessing protected pages.
+
+Configured the registration and login actions to allow unauthenticated access.
+
+Protected the Task Manager routes so logged-out users are redirected to the login page when attempting to access them.
+
+### 8. Login and Registration Page Customization
+
+Styled the login and registration pages using Tailwind CSS.
+
+- Applied a consistent dark-themed design.
+- Used matching card layouts, spacing, and borders.
+- Styled the email and password fields.
+- Added focus effects to the input fields.
+- Styled the submit buttons and navigation links.
+- Made both pages visually consistent with the existing Task Manager interface.
+
+### 9. Testing and Verification
+
+Tested the authentication system and verified the following:
+
+- Successfully registered a new user account.
+- Confirmed that users are automatically logged in after registration.
+- Successfully logged out of the application.
+- Successfully logged in using the registered account.
+- Confirmed that the navigation bar changes depending on authentication status.
+- Verified that logged-out users are redirected to the login page when accessing `/tasks`.
+
+All the main authentication functions were successfully tested.
+
+### 10. Git and GitHub Updates
+
+Prepared the Day 9 changes for version control using Git.
+
+The project continues to use the same GitHub repository and the `main` branch.
+
+---
+
 ## Project Structure
 
 ```text
@@ -330,12 +450,27 @@ first_rails_app/
 │   │   └── tailwind/
 │   │       └── application.css
 │   ├── controllers/
+│   │   ├── concerns/
+│   │   │   └── authentication.rb
+│   │   ├── application_controller.rb
+│   │   ├── passwords_controller.rb
+│   │   ├── registrations_controller.rb
+│   │   ├── sessions_controller.rb
 │   │   └── tasks_controller.rb
 │   ├── models/
 │   │   ├── category.rb
-│   │   └── task.rb
+│   │   ├── current.rb
+│   │   ├── session.rb
+│   │   ├── task.rb
+│   │   └── user.rb
 │   └── views/
 │       ├── layouts/
+│       │   └── application.html.erb
+│       ├── passwords/
+│       ├── registrations/
+│       │   └── new.html.erb
+│       ├── sessions/
+│       │   └── new.html.erb
 │       └── tasks/
 │           ├── _form.html.erb
 │           ├── _task.html.erb
@@ -376,6 +511,14 @@ Throughout these OJT activities, I learned how to:
 16. Apply model validations to maintain data integrity.
 17. Use strong parameters to permit associated model attributes.
 18. Display related model data in Rails views using ERB.
+19. Implement user authentication using Rails.
+20. Use `has_secure_password` for password authentication.
+21. Understand sessions and cookies in Rails.
+22. Build registration and login forms using Rails form helpers.
+23. Implement login and logout functionality.
+24. Use authentication concerns and `before_action` to protect routes.
+25. Display flash messages using notices and alerts.
+26. Customize authentication pages using Tailwind CSS.
 
 ## Conclusion
 
@@ -385,6 +528,8 @@ During Day 7, I continued developing the same application by integrating Tailwin
 
 During Day 8, I expanded the application by introducing a Category model and establishing a relationship between Category and Task. I also implemented model validations, database migrations, a category selection dropdown, and the display of related category information on the main page and task details page.
 
-These activities helped strengthen my understanding of Ruby on Rails, database configuration, MVC architecture, Active Record associations, data validation, frontend styling, application testing, and Git version control.
+During Day 9, I implemented an authentication system that allows users to register, log in, and log out. I also customized the login and registration pages, added authentication-based navigation and flash messages, and protected the Task Manager routes from unauthenticated users.
+
+These activities helped strengthen my understanding of Ruby on Rails, database configuration, MVC architecture, Active Record associations, data validation, frontend styling, authentication, session management, application testing, and Git version control.
 
 This project serves as a foundation for learning more advanced Rails concepts and improving my web application development skills.
