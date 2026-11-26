@@ -2,15 +2,17 @@
 
 ## Project Overview
 
-This project is a simple Task Manager web application developed using Ruby on Rails during my On-the-Job Training (OJT).
+This project is a Task Manager web application developed using Ruby on Rails during my On-the-Job Training (OJT).
 
-The application allows users to create, view, edit, and delete tasks. It also supports task categorization through a relationship between the Task and Category models. User authentication is also implemented, allowing users to register, log in, and log out while protecting task routes from unauthenticated access.
+The application allows users to create, view, edit, and delete tasks, organize them using categories, and add additional task details through nested forms.
+
+It also includes user authentication and account-based task ownership. Users can register, log in, and log out, while each user can access and manage only their own tasks through a personalized dashboard.
 
 The application uses PostgreSQL as its database management system and Tailwind CSS for styling the user interface.
 
 ## Technologies Used
 
-- **Ruby** – Programming language
+- **Ruby 4.0.9** – Programming language
 - **Ruby on Rails 8.1.4.1** – Web application framework
 - **PostgreSQL 18** – Database management system
 - **Tailwind CSS** – CSS framework for styling
@@ -356,6 +358,7 @@ These tables allow the application to store user account information and manage 
 Created a registration controller and registration form.
 
 The registration form includes:
+- Full name
 - Email address
 - Password
 - Password confirmation
@@ -391,7 +394,7 @@ When users log out, their current session is terminated and they are redirected 
 Updated the application layout to include navigation links based on the user's authentication status.
 
 **When Logged In**
-- Displays a welcome message.
+- Displays a personalized welcome message.
 - Shows the Log Out button.
 
 **When Logged Out**
@@ -440,15 +443,191 @@ The project continues to use the same GitHub repository and the `main` branch.
 
 ---
 
+# Day 10 – Nested Forms, Model Callbacks, and User Ownership
+
+## Activities Completed
+
+### 1. TaskDetail Model Creation
+
+Generated a TaskDetail model to allow each task to contain additional details.
+
+Used:
+
+```bash
+rails generate model TaskDetail task:references description:text
+```
+
+This generated the model and database migration.
+
+### 2. Task and TaskDetail Relationship
+
+Established a one-to-many relationship between Task and TaskDetail.
+
+Updated `app/models/task.rb`:
+
+```ruby
+class Task < ApplicationRecord
+  belongs_to :user
+  belongs_to :category, optional: true
+
+  has_many :task_details, dependent: :destroy
+
+  accepts_nested_attributes_for :task_details,
+    allow_destroy: true,
+    reject_if: :all_blank
+
+  validates :title, presence: true
+end
+```
+
+Updated `app/models/task_detail.rb`:
+
+```ruby
+class TaskDetail < ApplicationRecord
+  belongs_to :task
+
+  before_validation :normalize_description
+
+  validates :description, presence: true
+
+  private
+
+  def normalize_description
+    self.description = description.strip if description.present?
+  end
+end
+```
+
+These associations allow:
+- One Task to have multiple TaskDetails.
+- Each TaskDetail to belong to one Task.
+- TaskDetails to be automatically deleted when their associated task is deleted.
+
+### 3. Nested Forms
+
+Updated the shared task form to support nested TaskDetail attributes.
+
+Used Rails' `fields_for` helper to display additional detail fields within the task form.
+
+Implemented:
+- Adding task details.
+- Editing existing task details.
+- Deleting existing task details using the `_destroy` attribute.
+- Rejecting nested records when all their fields are blank.
+
+### 4. Model Callback
+
+Implemented a `before_validation` callback in the TaskDetail model.
+
+The callback automatically removes unnecessary leading and trailing whitespace from task detail descriptions before validation.
+
+This helps keep stored descriptions consistent.
+
+### 5. Testing Nested Forms and Callbacks
+
+Tested the nested form functionality through the browser.
+
+Verified that:
+- Task details can be added.
+- Existing task details can be edited.
+- Existing task details can be deleted.
+- Nested task details are associated with the correct task.
+
+Also tested nested attributes through the Rails console.
+
+### 6. User Name and Registration Updates
+
+Added a `name` attribute to the User model through a database migration.
+
+Updated the registration form and controller to accept the user's full name.
+
+Updated the navigation bar to display the logged-in user's name.
+
+### 7. Task Ownership and User Associations
+
+Established a one-to-many relationship between User and Task.
+
+Updated `app/models/user.rb`:
+
+```ruby
+has_many :tasks, dependent: :destroy
+```
+
+Updated `app/models/task.rb` to require an associated user:
+
+```ruby
+belongs_to :user
+```
+
+Added a `user_id` reference to the tasks table and migrated the database.
+
+Existing tasks were assigned to the first registered user before making the `user_id` column required.
+
+### 8. User-Specific Task Access
+
+Updated the TasksController to scope task operations to the currently authenticated user.
+
+Examples:
+
+```ruby
+def index
+  @tasks = Current.user.tasks.includes(:category).order(created_at: :desc)
+end
+```
+
+```ruby
+def set_task
+  @task = Current.user.tasks.find(params[:id])
+end
+```
+
+Updated task creation to associate new tasks with the logged-in user.
+
+This ensures that users can only view, edit, update, and delete tasks belonging to their own accounts.
+
+### 9. Personalized Dashboard
+
+Updated the application layout and task index page to display the logged-in user's name.
+
+The dashboard now includes a personalized welcome message and displays the current user's tasks.
+
+### 10. Testing and Verification
+
+Tested the updated application and verified that:
+
+- Users can register with their names.
+- The navigation bar displays the logged-in user's name.
+- The dashboard displays a personalized welcome message.
+- Users can create tasks while logged in.
+- Tasks are associated with their respective users.
+- Existing tasks were assigned to the first registered user.
+- A second user cannot access another user's task through its URL.
+- Unauthorized task lookup attempts return `ActiveRecord::RecordNotFound`.
+
+These tests confirmed that user-specific task ownership and access restrictions are working.
+
+### 11. Git and GitHub Updates
+
+Committed the Day 10 changes using Git.
+
+```bash
+git add .
+git commit -m "Day 10 Add nested task details and user ownership"
+git pull --rebase origin main
+git push origin main
+```
+
+Successfully committed and pushed the Day 10 changes to the `main` branch of the GitHub repository.
+
+Commit: `9425534`
+
+---
+
 ## Project Structure
 
 ```text
-first_rails_app/
+Ruby-on-Rails-Task-Manager-OJT/
 ├── app/
-│   ├── assets/
-│   │   ├── builds/
-│   │   └── tailwind/
-│   │       └── application.css
 │   ├── controllers/
 │   │   ├── concerns/
 │   │   │   └── authentication.rb
@@ -462,6 +641,7 @@ first_rails_app/
 │   │   ├── current.rb
 │   │   ├── session.rb
 │   │   ├── task.rb
+│   │   ├── task_detail.rb
 │   │   └── user.rb
 │   └── views/
 │       ├── layouts/
@@ -483,6 +663,8 @@ first_rails_app/
 │   ├── migrate/
 │   └── schema.rb
 ├── test/
+│   ├── fixtures/
+│   └── models/
 ├── Gemfile
 ├── Gemfile.lock
 ├── Procfile.dev
@@ -491,45 +673,56 @@ first_rails_app/
 
 ## What I Learned
 
-Throughout these OJT activities, I learned how to:
+Throughout these OJT activities, I gained practical experience with:
 
-1. Set up a Ruby on Rails development environment.
-2. Configure PostgreSQL as the database for a Rails application.
-3. Connect a Rails project to a PostgreSQL database.
-4. Generate scaffolds using Rails commands.
-5. Perform database migrations.
-6. Understand the basic MVC (Model-View-Controller) structure.
-7. Implement CRUD operations using Rails scaffolding.
-8. Configure application routes and customize controller actions.
-9. Integrate Tailwind CSS into a Rails application.
-10. Style Rails views, forms, buttons, and layouts using Tailwind CSS.
-11. Test CRUD functionality after customizing the application.
-12. Use Git commands to commit and push project updates to GitHub.
-13. Create model associations using Active Record.
-14. Establish one-to-many relationships between database tables.
-15. Use foreign keys to connect related records.
-16. Apply model validations to maintain data integrity.
-17. Use strong parameters to permit associated model attributes.
-18. Display related model data in Rails views using ERB.
-19. Implement user authentication using Rails.
-20. Use `has_secure_password` for password authentication.
-21. Understand sessions and cookies in Rails.
-22. Build registration and login forms using Rails form helpers.
-23. Implement login and logout functionality.
-24. Use authentication concerns and `before_action` to protect routes.
-25. Display flash messages using notices and alerts.
-26. Customize authentication pages using Tailwind CSS.
+1. Setting up a Ruby on Rails development environment.
+2. Configuring PostgreSQL as the database for a Rails application.
+3. Generating scaffolds using Rails commands.
+4. Performing database migrations.
+5. Understanding the Model-View-Controller (MVC) architecture.
+6. Implementing CRUD operations.
+7. Configuring application routes and controller actions.
+8. Integrating Tailwind CSS into a Rails application.
+9. Styling Rails views, forms, buttons, and layouts.
+10. Testing CRUD functionality after customizing the application.
+11. Using Git and GitHub for version control.
+12. Creating model associations using Active Record.
+13. Establishing one-to-many relationships between database tables.
+14. Using foreign keys to connect related records.
+15. Applying model validations to maintain data integrity.
+16. Using strong parameters to permit associated model attributes.
+17. Displaying related model data in Rails views using ERB.
+18. Implementing user authentication using Rails.
+19. Using `has_secure_password` for password authentication.
+20. Understanding sessions and cookies in Rails.
+21. Building registration and login forms using Rails form helpers.
+22. Implementing login and logout functionality.
+23. Using authentication concerns and `before_action` to protect routes.
+24. Displaying flash messages using notices and alerts.
+25. Working with nested forms and nested attributes.
+26. Implementing model callbacks to normalize data.
+27. Associating records with individual users.
+28. Restricting database queries to the currently authenticated user.
+29. Testing user-specific access restrictions.
 
 ## Conclusion
 
-During Day 6, I successfully set up a Ruby on Rails application, configured PostgreSQL as its database, and implemented basic CRUD functionality for the Task Manager.
+From Day 6 to Day 10, I developed the Task Manager application step by step using Ruby on Rails and PostgreSQL.
 
-During Day 7, I continued developing the same application by integrating Tailwind CSS, customizing the homepage and task forms, improving the task details page, and testing the CRUD operations again.
+I started by setting up the development environment and implementing basic CRUD functionality. I then improved the interface using Tailwind CSS, introduced categories and Active Record associations, and implemented model validations.
 
-During Day 8, I expanded the application by introducing a Category model and establishing a relationship between Category and Task. I also implemented model validations, database migrations, a category selection dropdown, and the display of related category information on the main page and task details page.
+During Day 9, I added user authentication, including registration, login, logout, and protected routes.
 
-During Day 9, I implemented an authentication system that allows users to register, log in, and log out. I also customized the login and registration pages, added authentication-based navigation and flash messages, and protected the Task Manager routes from unauthenticated users.
+For Day 10, I expanded the application by implementing nested forms, model callbacks, personalized dashboards, and user-specific task ownership. I also tested that users cannot access tasks belonging to other accounts.
 
-These activities helped strengthen my understanding of Ruby on Rails, database configuration, MVC architecture, Active Record associations, data validation, frontend styling, authentication, session management, application testing, and Git version control.
+This project strengthened my understanding of Ruby on Rails, database management, MVC architecture, Active Record, authentication, nested attributes, model callbacks, data validation, frontend styling, and Git version control.
 
-This project serves as a foundation for learning more advanced Rails concepts and improving my web application development skills.
+It also provided practical experience in developing a more complete web application while following a structured OJT learning process.
+
+## Repository
+
+**GitHub:** https://github.com/BaronDF/Ruby-on-Rails-Task-Manager-OJT
+
+## Live Demo
+
+Deployment and live demo preparation are the next steps.
