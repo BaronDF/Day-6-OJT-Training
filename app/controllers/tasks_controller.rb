@@ -1,75 +1,92 @@
-class TasksController < ApplicationController
-  before_action :set_task, only: %i[ show edit update destroy ]
 
-  # GET /tasks or /tasks.json
+class TasksController < ApplicationController
+  before_action :set_task, only: %i[show edit update destroy]
+
+  # GET /tasks
   def index
-  @tasks = Task.order(created_at: :desc)
+    @tasks = Current.user.tasks.includes(:category).order(created_at: :desc)
   end
 
-  # GET /tasks/1 or /tasks/1.json
+  # GET /tasks/1
   def show
   end
 
   # GET /tasks/new
   def new
-  @task = Task.new
-  @categories = Category.all
+    @task = Current.user.tasks.build
+    @task.task_details.build
+    @categories = Category.all
   end
 
   # GET /tasks/1/edit
- def edit
-  @categories = Category.all
+  def edit
+    @task.task_details.build if @task.task_details.empty?
+    @categories = Category.all
   end
 
-  # POST /tasks or /tasks.json
+  # POST /tasks
   def create
-  @task = Task.new(task_params)
-  @categories = Category.all
+    @task = Current.user.tasks.build(task_params)
+    Rails.logger.debug "NESTED DETAILS: #{@task.task_details.map(&:description).inspect}"
+    @categories = Category.all
 
-  respond_to do |format|
-    if @task.save
-      format.html { redirect_to @task, notice: "Task was successfully created." }
-      format.json { render :show, status: :created, location: @task }
-    else
-      format.html { render :new, status: :unprocessable_content }
-      format.json { render json: @task.errors, status: :unprocessable_content }
+    respond_to do |format|
+      if @task.save
+        format.html { redirect_to @task, notice: "Task was successfully created." }
+        format.json { render :show, status: :created, location: @task }
+      else
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @task.errors, status: :unprocessable_content }
+      end
     end
   end
-end
 
-  # PATCH/PUT /tasks/1 or /tasks/1.json
+  # PATCH/PUT /tasks/1
   def update
-  @categories = Category.all
+    @categories = Category.all
 
-  respond_to do |format|
+    Rails.logger.debug "PARAMETERS: #{params.inspect}"
+
     if @task.update(task_params)
-      format.html { redirect_to @task, notice: "Task was successfully updated.", status: :see_other }
-      format.json { render :show, status: :ok, location: @task }
+      redirect_to @task, notice: "Task was successfully updated."
     else
-      format.html { render :edit, status: :unprocessable_content }
-      format.json { render json: @task.errors, status: :unprocessable_content }
+      render :edit, status: :unprocessable_content
     end
   end
-end
 
-  # DELETE /tasks/1 or /tasks/1.json
+  # DELETE /tasks/1
   def destroy
     @task.destroy!
 
     respond_to do |format|
-      format.html { redirect_to tasks_path, notice: "Task was successfully destroyed.", status: :see_other }
+      format.html do
+        redirect_to tasks_path,
+                    notice: "Task was successfully destroyed.",
+                    status: :see_other
+      end
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_task
-      @task = Task.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-def task_params
-  params.expect(task: [ :title, :description, :completed, :category_id ])
-end
+  # Only find tasks belonging to the logged-in user.
+  def set_task
+    @task = Current.user.tasks.find(params[:id])
+  end
+
+  # Only allow trusted parameters.
+  def task_params
+    params.require(:task).permit(
+      :title,
+      :description,
+      :completed,
+      :category_id,
+      task_details_attributes: [
+        :id,
+        :description,
+        :_destroy
+      ]
+    )
+  end
 end
